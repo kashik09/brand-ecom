@@ -3,6 +3,10 @@ import PDFDocument from "pdfkit"
 import { getOrderById } from "@/lib/store"
 import { ZONES } from "@/lib/shipping"
 
+// ensure Node.js runtime
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const orderId = searchParams.get("orderId")
@@ -18,16 +22,13 @@ export async function GET(req: NextRequest) {
   const brand = process.env.NEXT_PUBLIC_BRAND_NAME || "Brand"
   const zone = ZONES[order.shippingZone as keyof typeof ZONES]
 
-  // build PDF in memory
+  // Build PDF in memory
   const doc = new PDFDocument({ size: "A4", margin: 50 })
-  const chunks: Uint8Array[] = []
-  let resolveCb: (v: ArrayBuffer) => void
-  const done = new Promise<ArrayBuffer>((resolve) => (resolveCb = resolve))
+  const chunks: Buffer[] = []
 
-  doc.on("data", (c) => chunks.push(c))
-  doc.on("end", () => {
-    const blob = Buffer.concat(chunks)
-    resolveCb!(blob)
+  const done = new Promise<Buffer>((resolve) => {
+    doc.on("data", (c: Buffer) => chunks.push(c))
+    doc.on("end", () => resolve(Buffer.concat(chunks)))
   })
 
   // Header
