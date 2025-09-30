@@ -2,13 +2,14 @@
 
 import { useState } from "react"
 import { useCart } from "@/state/cart"
-import { ZONES } from "@/lib/shipping"
 import type { ShippingZoneCode, OrderInput, Customer } from "@/types/cart"
 import { buildWhatsAppLink } from "@/lib/wa"
 import { useRouter } from "next/navigation"
+import { useSettings } from "@/lib/settings"
 
 export default function CheckoutPage() {
   const { items, subtotal, clear } = useCart()
+  const { zones } = useSettings()
   const router = useRouter()
   const [customer, setCustomer] = useState<Customer>({ name: "", email: "", phone: "" })
   const [zone, setZone] = useState<ShippingZoneCode>("PICKUP")
@@ -16,19 +17,17 @@ export default function CheckoutPage() {
 
   if (items.length === 0) return <div>Cart is empty.</div>
 
-  const shippingFee = ZONES[zone].fee
+  const shippingFee = zones[zone].fee
   const total = subtotal + shippingFee
 
   async function placeOrder() {
     const order: OrderInput = {
       items, subtotal, shippingZone: zone, shippingFee, total, customer, notes
     }
-    // 1) save on server
     const res = await fetch("/api/orders", { method: "POST", body: JSON.stringify(order) })
     if (!res.ok) { alert("Failed to save order."); return }
     const { orderId } = await res.json()
 
-    // 2) build WA link and redirect
     const link = buildWhatsAppLink(order)
     if (!link) { alert("Set NEXT_PUBLIC_WHATSAPP_NUMBER in .env.local"); return }
 
@@ -56,17 +55,20 @@ export default function CheckoutPage() {
         <div className="space-y-3">
           <h2 className="font-semibold">Delivery</h2>
           <div className="grid gap-2">
-            {Object.entries(ZONES).map(([code, z]) => (
-              <label key={code} className="flex items-center gap-3 border rounded-xl p-3">
-                <input type="radio" name="zone" checked={zone===code}
-                  onChange={()=>setZone(code as any)} />
-                <div className="flex-1">
-                  <div className="font-medium">{z.label}</div>
-                  <div className="text-sm text-gray-500">ETA: {z.eta}</div>
-                </div>
-                <div className="font-semibold">${z.fee.toFixed(2)}</div>
-              </label>
-            ))}
+            {(Object.keys(zones) as ShippingZoneCode[]).map((code) => {
+              const z = zones[code]
+              return (
+                <label key={code} className="flex items-center gap-3 border rounded-xl p-3">
+                  <input type="radio" name="zone" checked={zone===code}
+                    onChange={()=>setZone(code)} />
+                  <div className="flex-1">
+                    <div className="font-medium">{z.label}</div>
+                    <div className="text-sm text-gray-500">ETA: {z.eta}</div>
+                  </div>
+                  <div className="font-semibold">${z.fee.toFixed(2)}</div>
+                </label>
+              )
+            })}
           </div>
 
           <div className="flex items-center justify-between pt-2">
