@@ -1,6 +1,9 @@
+// src/app/product/[slug]/page.tsx
+
 import { getProductBySlug } from "@/lib/products"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import AddToCart from "./AddToCart"
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const p = getProductBySlug(params.slug)
@@ -43,17 +46,16 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
             </div>
           )
         ) : (
-          <div className="space-y-2">
-            <Button disabled title="Cart comes in Sprint 2">Add to cart (coming in Sprint 2)</Button>
-            <p className="text-xs text-gray-500">
-              Digital delivery uses secure, time-limited links after purchase.
-            </p>
-          </div>
+          <AddToCart p={p} />
         )}
 
         <div className="pt-6 border-t">
           <p className="text-sm text-gray-500">
-            Sold by {brand}. Need help? <Link className="underline" href="/contact">Contact us</Link>.
+            Sold by {brand}. Need help?{" "}
+            <Link className="underline" href="/contact">
+              Contact us
+            </Link>
+            .
           </p>
         </div>
       </div>
