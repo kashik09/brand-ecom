@@ -4,9 +4,11 @@ export function buildWhatsAppLink(order: OrderInput) {
   const num = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || ""
   if (!num) return null
 
-  const items = order.items.map(i => `- ${i.title} x${i.qty} = $${(i.price*i.qty).toFixed(2)}`).join("%0A")
-  const text =
-`Order Request
+  const items = order.items
+    .map(i => `- ${i.title} x${i.qty} = $${(i.price * i.qty).toFixed(2)}`)
+    .join("\n")
+
+  const text = `Order Request
 Name: ${order.customer.name}
 Email: ${order.customer.email}
 Phone: ${order.customer.phone}
