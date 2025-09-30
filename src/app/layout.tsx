@@ -2,6 +2,8 @@ import type { Metadata } from "next"
 import "./globals.css"
 import { ThemeProvider } from "@/lib/theme-provider"
 import ThemeToggle from "@/components/theme-toggle"
+import { CartProvider } from "@/state/cart"
+import CartButton from "@/components/CartButton"
 
 export const metadata: Metadata = {
   title: process.env.NEXT_PUBLIC_BRAND_NAME || "Brand",
@@ -19,31 +21,50 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <style>{`:root{--color-primary:${primary}}`}</style>
 
         <ThemeProvider>
-          <header className="border-b sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur">
-            <div className="container py-3 flex items-center justify-between">
-              <a href="/" className="font-semibold text-lg" style={{ color: "var(--color-primary)" }}>
-                {brand}
-              </a>
-              <nav className="flex items-center gap-3">
-                <a href="/shop" className="text-sm hover:underline">Shop</a>
-                <a href="/contact" className="text-sm hover:underline">Contact</a>
-                <ThemeToggle />
-              </nav>
-            </div>
-          </header>
-
-          <main className="container-narrow py-10">{children}</main>
-
-          <footer className="mt-16 border-t">
-            <div className="container py-8 text-sm text-gray-500 flex items-center justify-between">
-              <span>© {new Date().getFullYear()} {brand}</span>
-              <div className="flex gap-4">
-                <a href="/legal/privacy" className="hover:underline">Privacy</a>
-                <a href="/legal/terms" className="hover:underline">Terms</a>
-                <a href="/legal/refunds" className="hover:underline">Refunds</a>
+          <CartProvider>
+            <header className="border-b sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur">
+              <div className="container py-3 flex items-center justify-between">
+                <a
+                  href="/"
+                  className="font-semibold text-lg"
+                  style={{ color: "var(--color-primary)" }}
+                >
+                  {brand}
+                </a>
+                <nav className="flex items-center gap-3">
+                  <a href="/shop" className="text-sm hover:underline">
+                    Shop
+                  </a>
+                  <a href="/contact" className="text-sm hover:underline">
+                    Contact
+                  </a>
+                  <CartButton />
+                  <ThemeToggle />
+                </nav>
               </div>
-            </div>
-          </footer>
+            </header>
+
+            <main className="container-narrow py-10">{children}</main>
+
+            <footer className="mt-16 border-t">
+              <div className="container py-8 text-sm text-gray-500 flex items-center justify-between">
+                <span>
+                  © {new Date().getFullYear()} {brand}
+                </span>
+                <div className="flex gap-4">
+                  <a href="/legal/privacy" className="hover:underline">
+                    Privacy
+                  </a>
+                  <a href="/legal/terms" className="hover:underline">
+                    Terms
+                  </a>
+                  <a href="/legal/refunds" className="hover:underline">
+                    Refunds
+                  </a>
+                </div>
+              </div>
+            </footer>
+          </CartProvider>
         </ThemeProvider>
       </body>
     </html>
