@@ -1,14 +1,8 @@
-// src/app/product/[slug]/page.tsx
-
+import Link from "next/link"
+import Image from "next/image"
 import { getProductBySlug } from "@/lib/products"
 import { Button } from "@/components/ui/button"
-import Link from "next/link"
 import AddToCart from "./AddToCart"
-
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const p = getProductBySlug(params.slug)
-  return { title: p ? p.title : "Product" }
-}
 
 function waLinkForService(title: string) {
   const num = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || ""
@@ -17,8 +11,25 @@ function waLinkForService(title: string) {
   return `https://wa.me/${num}?text=${msg}`
 }
 
-export default function ProductPage({ params }: { params: { slug: string } }) {
-  const p = getProductBySlug(params.slug)
+// ✅ Next 15: params is a Promise in RSC
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params
+  const p = getProductBySlug(slug)
+  return { title: p ? p.title : "Product" }
+}
+
+// ✅ Next 15: make component async and await params
+export default async function ProductPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params
+  const p = getProductBySlug(slug)
   if (!p) return <div className="py-20">Not found.</div>
 
   const brand = process.env.NEXT_PUBLIC_BRAND_NAME || "Brand"
@@ -27,7 +38,14 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
   return (
     <article className="grid gap-8 md:grid-cols-2">
       <div className="rounded-2xl border p-6">
-        <img src={p.image} alt={p.title} className="w-full h-64 object-contain" />
+        <Image
+          src={p.image}
+          alt={p.title}
+          width={800}
+          height={600}
+          className="w-full h-auto object-contain"
+          priority
+        />
       </div>
 
       <div className="space-y-4">
@@ -51,11 +69,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
 
         <div className="pt-6 border-t">
           <p className="text-sm text-gray-500">
-            Sold by {brand}. Need help?{" "}
-            <Link className="underline" href="/contact">
-              Contact us
-            </Link>
-            .
+            Sold by {brand}. Need help? <Link className="underline" href="/contact">Contact us</Link>.
           </p>
         </div>
       </div>
