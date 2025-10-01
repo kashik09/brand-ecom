@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
-import { saveOrder } from "@/lib/store"
-
-let MEMORY_ORDERS: any[] = [] // temp in-memory store (wire Supabase later)
+import { saveOrder, type StoredOrder } from "@/lib/store"
 
 export async function POST(req: NextRequest) {
-  const body = await req.json()
+  const body = (await req.json()) as Omit<StoredOrder, "id" | "createdAt">
   const orderId = crypto.randomUUID()
-  MEMORY_ORDERS.push({ id: orderId, ...body, createdAt: new Date().toISOString() })
+  const saved: StoredOrder = {
+    id: orderId,
+    createdAt: new Date().toISOString(),
+    ...body,
+  }
+  saveOrder(saved)
   return NextResponse.json({ orderId })
 }
