@@ -9,16 +9,26 @@ type Params = { params: { slug: string } }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const p = getProductBySlug(params.slug)
-  if (!p) return { title: "Product", alternates: { canonical: "/shop" } }
+  if (!p) {
+    return { title: "Product", alternates: { canonical: "/shop" } }
+  }
   return {
     title: p.title,
     description: p.shortDesc,
     alternates: { canonical: `/product/${p.slug}` },
     openGraph: {
-      type: "product",
+      // ✅ Next's Metadata typing allows "website" here (not "product")
+      type: "website",
       url: siteUrl(`/product/${p.slug}`),
       title: p.title,
       description: p.shortDesc,
+      images: [{ url: siteUrl(p.image), alt: p.title }], // optional but nice
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: p.title,
+      description: p.shortDesc,
+      images: [siteUrl(p.image)],
     },
   }
 }
@@ -41,9 +51,7 @@ function ProductJsonLD({ slug }: { slug: string }) {
       url: siteUrl(`/product/${p.slug}`),
     },
   }
-  return (
-    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
-  )
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
 }
 
 function waLinkForService(title: string) {
