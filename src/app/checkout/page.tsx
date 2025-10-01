@@ -1,3 +1,5 @@
+export const metadata = { title: "Checkout", alternates: { canonical: "/checkout" } }
+
 "use client"
 
 import { useState } from "react"

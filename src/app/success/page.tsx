@@ -1,3 +1,5 @@
+export const metadata = { title: "Order Saved", alternates: { canonical: "/success" } }
+
 import { Suspense } from "react"
 import SuccessClient from "./success-client"
 
