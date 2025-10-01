@@ -1,0 +1,44 @@
+-- Enable UUIDs
+create extension if not exists pgcrypto; -- for gen_random_uuid()
+
+-- ORDERS
+create table if not exists public.orders (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz default now(),
+  subtotal numeric not null,
+  shipping_zone text not null,
+  shipping_fee numeric not null,
+  total numeric not null,
+  customer_name text,
+  customer_email text,
+  customer_phone text,
+  notes text
+);
+
+-- ORDER ITEMS
+create table if not exists public.order_items (
+  id bigserial primary key,
+  order_id uuid references public.orders(id) on delete cascade,
+  product_id text not null,
+  title text not null,
+  price numeric not null,
+  qty int not null,
+  type text not null
+);
+
+-- SETTINGS: SHIPPING ZONES
+create table if not exists public.settings_zones (
+  code text primary key,           -- Z1, Z2, Z3, PICKUP
+  label text not null,
+  fee numeric not null,
+  eta text not null,
+  updated_at timestamptz default now()
+);
+
+-- seed defaults once
+insert into public.settings_zones(code,label,fee,eta) values
+('Z1','City center',5,'Same day'),
+('Z2','Inner suburbs',7,'1 day'),
+('Z3','Outer suburbs',10,'1–2 days'),
+('PICKUP','Pickup at store',0,'By schedule')
+on conflict (code) do nothing;
