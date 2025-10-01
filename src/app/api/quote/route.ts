@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
 
   // Items
   doc.fontSize(12).text("Items", { underline: true })
-  for (const i of order.items as any[]) {
+  for (const i of order.items as Array<{ title: string; qty: number; price: number }>) {
     doc.fontSize(11).text(`${i.title} x${i.qty} — $${(i.price * i.qty).toFixed(2)}`)
   }
   doc.moveDown()
