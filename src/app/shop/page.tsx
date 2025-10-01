@@ -1,7 +1,10 @@
 import ProductCard from "@/components/ProductCard"
 import { products } from "@/lib/products"
 
-export const metadata = { title: "Shop" }
+export const metadata = {
+  title: "Shop",
+  alternates: { canonical: "/shop" },
+}
 
 export default function ShopPage() {
   return (
@@ -13,7 +16,6 @@ export default function ShopPage() {
         </div>
       </header>
 
-      {/* simple filters coming later; MVP shows all */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {products.map(p => <ProductCard key={p.id} p={p} />)}
       </div>

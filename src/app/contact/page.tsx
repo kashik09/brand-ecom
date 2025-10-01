@@ -1,4 +1,7 @@
-export const metadata = { title: "Contact" }
+export const metadata = {
+  title: "Contact",
+  alternates: { canonical: "/contact" },
+}
 
 export default function ContactPage() {
   const num = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || ""

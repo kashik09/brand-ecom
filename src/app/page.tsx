@@ -1,3 +1,8 @@
+export const metadata = {
+  title: "Home",
+  alternates: { canonical: "/" },
+}
+
 export default function HomePage() {
   return (
     <section className="space-y-6">
