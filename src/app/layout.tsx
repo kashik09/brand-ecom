@@ -1,3 +1,4 @@
+// src/app/layout.tsx
 import type { Metadata } from "next"
 import "./globals.css"
 import { ThemeProvider } from "@/lib/theme-provider"
@@ -6,15 +7,39 @@ import { CartProvider } from "@/state/cart"
 import CartButton from "@/components/CartButton"
 import { SettingsProvider } from "@/lib/settings"
 import Link from "next/link"
+import { siteUrl } from "@/lib/site"
+
+const BRAND = process.env.NEXT_PUBLIC_BRAND_NAME || "BrandName"
+const PRIMARY = process.env.NEXT_PUBLIC_PRIMARY_COLOR || "#0EA5E9"
+const BASE = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
 
 export const metadata: Metadata = {
-  title: process.env.NEXT_PUBLIC_BRAND_NAME || "Brand",
+  metadataBase: new URL(BASE),
+  title: {
+    default: `${BRAND}`,
+    template: `%s • ${BRAND}`,
+  },
   description: "Custom e-commerce MVP",
+  openGraph: {
+    type: "website",
+    url: siteUrl("/"),
+    title: BRAND,
+    description: "Custom e-commerce MVP",
+    siteName: BRAND,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: BRAND,
+    description: "Custom e-commerce MVP",
+  },
+  alternates: {
+    canonical: siteUrl("/"),
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const brand = process.env.NEXT_PUBLIC_BRAND_NAME || "BrandName"
-  const primary = process.env.NEXT_PUBLIC_PRIMARY_COLOR || "#0EA5E9"
+  const brand = BRAND
+  const primary = PRIMARY
 
   return (
     <html lang="en" suppressHydrationWarning>
