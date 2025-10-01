@@ -5,6 +5,7 @@ import ThemeToggle from "@/components/theme-toggle"
 import { CartProvider } from "@/state/cart"
 import CartButton from "@/components/CartButton"
 import { SettingsProvider } from "@/lib/settings"
+import Link from "next/link"
 
 export const metadata: Metadata = {
   title: process.env.NEXT_PUBLIC_BRAND_NAME || "Brand",
@@ -17,8 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
-        {/* expose primary color as css var for runtime theming */}
+      <body className="bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100">
         <style>{`:root{--color-primary:${primary}}`}</style>
 
         <ThemeProvider>
@@ -26,17 +26,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <CartProvider>
               <header className="border-b sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur">
                 <div className="container py-3 flex items-center justify-between">
-                  <a
-                    href="/"
-                    className="font-semibold text-lg"
-                    style={{ color: "var(--color-primary)" }}
-                  >
+                  <Link href="/" className="font-semibold text-lg" style={{ color: "var(--color-primary)" }}>
                     {brand}
-                  </a>
+                  </Link>
                   <nav className="flex items-center gap-3">
-                    <a href="/shop" className="text-sm hover:underline">Shop</a>
-                    <a href="/contact" className="text-sm hover:underline">Contact</a>
-                    <a href="/admin" className="text-sm hover:underline">Admin</a>
+                    <Link href="/shop" className="text-sm hover:underline">Shop</Link>
+                    <Link href="/contact" className="text-sm hover:underline">Contact</Link>
+                    <Link href="/admin" className="text-sm hover:underline">Admin</Link>
                     <CartButton />
                     <ThemeToggle />
                   </nav>
@@ -49,9 +45,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <div className="container py-8 text-sm text-gray-500 flex items-center justify-between">
                   <span>© {new Date().getFullYear()} {brand}</span>
                   <div className="flex gap-4">
-                    <a href="/legal/privacy" className="hover:underline">Privacy</a>
-                    <a href="/legal/terms" className="hover:underline">Terms</a>
-                    <a href="/legal/refunds" className="hover:underline">Refunds</a>
+                    <Link href="/legal/privacy" className="hover:underline">Privacy</Link>
+                    <Link href="/legal/terms" className="hover:underline">Terms</Link>
+                    <Link href="/legal/refunds" className="hover:underline">Refunds</Link>
                   </div>
                 </div>
               </footer>
