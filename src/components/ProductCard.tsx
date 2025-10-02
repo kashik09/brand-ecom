@@ -12,22 +12,16 @@ function formatCurrency(n: number) {
 
 export default function ProductCard({ p }: { p: Product }) {
   return (
-    <div className="rounded-2xl border p-4 flex flex-col gap-3 hover:bg-gray-50 dark:hover:bg-gray-900">
-      <div className="w-full h-36 relative">
-        <Image src={p.image} alt={p.title} fill className="object-contain" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"/>
-      </div>
+    <Link href={`/product/${p.slug}`} className="rounded-2xl border p-4 flex flex-col gap-3 hover:bg-gray-50 dark:hover:bg-gray-900">
+      <img src={p.image} alt={p.title} className="w-full h-36 object-contain" />
       <div className="flex-1">
-        <Link href={`/product/${p.slug}`} className="font-semibold hover:underline">
-          {p.title}
-        </Link>
+        <div className="font-semibold">{p.title}</div>
         <p className="text-sm text-gray-500 mt-1">{p.shortDesc}</p>
       </div>
       <div className="flex items-center justify-between">
         <span className="font-semibold">{UGX(p.price)}</span>
-        <Link href={`/product/${p.slug}`}>
-          <Button>View</Button>
-        </Link>
+        <span className="text-xs underline">View</span>
       </div>
-    </div>
+    </Link>
   )
 }

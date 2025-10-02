@@ -81,17 +81,8 @@ export default function ProductPage({ params }: Params) {
           <h1 className="text-2xl font-bold">{p.title}</h1>
           <p className="text-gray-600 dark:text-gray-300">{p.shortDesc}</p>
           <div className="text-xl font-semibold">{UGX(p.price)}</div>
-          {p.type === "service" ? (
-            wa ? (
-              <a href={wa} target="_blank" rel="noreferrer">
-                <Button>Enquire on WhatsApp</Button>
-              </a>
-            ) : (
-              <div className="text-sm text-amber-600">Set NEXT_PUBLIC_WHATSAPP_NUMBER in .env.local.</div>
-            )
-          ) : (
-            <AddToCart p={p} />
-          )}
+
+          <AddToCart p={p} />
 
           <div className="pt-6 border-t">
             <p className="text-sm text-gray-500">
