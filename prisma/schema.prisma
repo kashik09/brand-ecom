@@ -26,15 +26,25 @@ model Profile {
 }
 
 model Order {
-  id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  createdAt     DateTime    @default(now()) @map("created_at")
-  subtotal      Decimal     @db.Numeric
-  shippingZone  String      @map("shipping_zone")
-  shippingFee   Decimal     @db.Numeric @map("shipping_fee")
-  total         Decimal     @db.Numeric
-  customerName  String?     @map("customer_name")
-  customerEmail String?     @map("customer_email")
-  customerPhone String?     @map("customer_phone")
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  // choose ONE of these two styles ↓↓↓ (uncomment what you want)
+  // If you want NO cents (UGX):
+  subtotal      Decimal  @db.Decimal(20, 0)
+  shippingZone  String   @map("shipping_zone")
+  shippingFee   Decimal  @db.Decimal(20, 0) @map("shipping_fee")
+  total         Decimal  @db.Decimal(20, 0)
+
+  // If you want optional cents (comment the block above, uncomment below):
+  // subtotal      Decimal  @db.Decimal(20, 2)
+  // shippingZone  String   @map("shipping_zone")
+  // shippingFee   Decimal  @db.Decimal(20, 2) @map("shipping_fee")
+  // total         Decimal  @db.Decimal(20, 2)
+
+  customerName  String?  @map("customer_name")
+  customerEmail String?  @map("customer_email")
+  customerPhone String?  @map("customer_phone")
   notes         String?
 
   items         OrderItem[]
@@ -47,22 +57,24 @@ model OrderItem {
   orderId   String  @db.Uuid @map("order_id")
   productId String  @map("product_id")
   title     String
-  price     Decimal @db.Numeric
+
+  // match the choice above (0 or 2)
+  price     Decimal @db.Decimal(20, 0)
+
   qty       Int
   type      String
-
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order     Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@map("order_items")
 }
 
 model DownloadToken {
-  token      String  @id
-  orderId    String  @db.Uuid @map("order_id")
-  productId  String  @map("product_id")
-  filePath   String  @map("file_path")
-  expiresAt  DateTime @map("expires_at")
-  remaining  Int
+  token     String   @id
+  orderId   String   @db.Uuid @map("order_id")
+  productId String   @map("product_id")
+  filePath  String   @map("file_path")
+  expiresAt DateTime @map("expires_at")
+  remaining Int
 
   @@map("download_tokens")
 }
