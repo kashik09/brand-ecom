@@ -24,3 +24,45 @@ model Profile {
   // extra fields you want later
   // location  String?
 }
+
+model Order {
+  id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt     DateTime    @default(now()) @map("created_at")
+  subtotal      Decimal     @db.Numeric
+  shippingZone  String      @map("shipping_zone")
+  shippingFee   Decimal     @db.Numeric @map("shipping_fee")
+  total         Decimal     @db.Numeric
+  customerName  String?     @map("customer_name")
+  customerEmail String?     @map("customer_email")
+  customerPhone String?     @map("customer_phone")
+  notes         String?
+
+  items         OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        BigInt  @id @default(autoincrement())
+  orderId   String  @db.Uuid @map("order_id")
+  productId String  @map("product_id")
+  title     String
+  price     Decimal @db.Numeric
+  qty       Int
+  type      String
+
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("order_items")
+}
+
+model DownloadToken {
+  token      String  @id
+  orderId    String  @db.Uuid @map("order_id")
+  productId  String  @map("product_id")
+  filePath   String  @map("file_path")
+  expiresAt  DateTime @map("expires_at")
+  remaining  Int
+
+  @@map("download_tokens")
+}
