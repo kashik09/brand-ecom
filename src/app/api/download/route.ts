@@ -6,21 +6,20 @@ export async function GET(req: NextRequest) {
   const token = searchParams.get("token")
   if (!token) return NextResponse.json({ error: "Missing token" }, { status: 400 })
 
-  const t = await prisma.download_tokens.findUnique({ where: { token } })
+  const t = await prisma.downloadToken.findUnique({ where: { token } })
   if (!t) return NextResponse.json({ error: "Invalid or expired token" }, { status: 404 })
 
-  if (t.expires_at.getTime() < Date.now()) {
+  if (t.expiresAt.getTime() < Date.now()) {
     return NextResponse.json({ error: "Token expired" }, { status: 410 })
   }
   if (t.remaining <= 0) {
     return NextResponse.json({ error: "Download limit reached" }, { status: 410 })
   }
 
-  await prisma.download_tokens.update({
+  await prisma.downloadToken.update({
     where: { token },
     data: { remaining: t.remaining - 1 },
   })
 
-  // redirect to the static file for now (later: S3/R2 signed URLs)
-  return NextResponse.redirect(new URL(t.file_path, req.url))
+  return NextResponse.redirect(new URL(t.filePath, req.url))
 }
