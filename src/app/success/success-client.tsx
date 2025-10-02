@@ -29,6 +29,11 @@ export default function SuccessClient() {
           Also: <a className="underline" href={pdfHref} target="_blank" rel="noreferrer">Download Quote (PDF)</a>
         </p>
       )}
+      {orderId && (
+        <p>
+          Admin: <a className="underline" href={`/admin/orders#${orderId}`}>View in Orders</a>
+        </p>
+      )}
       <Link href="/shop" className="underline">Back to shop</Link>
     </section>
   )
