@@ -12,6 +12,7 @@ import { siteUrl } from "@/lib/site"
 const BRAND = process.env.NEXT_PUBLIC_BRAND_NAME || "BrandName"
 const PRIMARY = process.env.NEXT_PUBLIC_PRIMARY_COLOR || "#0EA5E9"
 const BASE = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+const wa = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ? `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}` : null
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE),
@@ -56,7 +57,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   </Link>
                   <nav className="flex items-center gap-3">
                     <Link href="/shop" className="text-sm hover:underline">Shop</Link>
-                    <Link href="/contact" className="text-sm hover:underline">Contact</Link>
+                    {wa ? (
+                      <a href={wa} target="_blank" rel="noreferrer" className="text-sm hover:underline">WhatsApp</a>
+                    ) : (
+                      <a href="/contact" className="text-sm hover:underline">Contact</a>
+                    )}
                     <Link href="/admin" className="text-sm hover:underline">Admin</Link>
                     <CartButton />
                     <ThemeToggle />
