@@ -4,6 +4,7 @@ import Link from "next/link"
 import AddToCart from "./AddToCart"
 import type { Metadata } from "next"
 import { siteUrl } from "@/lib/site"
+import { UGX } from "@/lib/currency"
 
 type Params = { params: { slug: string } }
 
@@ -79,8 +80,7 @@ export default function ProductPage({ params }: Params) {
         <div className="space-y-4">
           <h1 className="text-2xl font-bold">{p.title}</h1>
           <p className="text-gray-600 dark:text-gray-300">{p.shortDesc}</p>
-          <div className="text-xl font-semibold">${p.price}</div>
-
+          <div className="text-xl font-semibold">{UGX(p.price)}</div>
           {p.type === "service" ? (
             wa ? (
               <a href={wa} target="_blank" rel="noreferrer">

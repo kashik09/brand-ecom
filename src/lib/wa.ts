@@ -1,11 +1,12 @@
 import type { OrderInput } from "@/types/cart"
+import { UGX } from "@/lib/currency"
 
 export function buildWhatsAppLink(order: OrderInput) {
   const num = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || ""
   if (!num) return null
 
   const items = order.items
-    .map(i => `- ${i.title} x${i.qty} = $${(i.price * i.qty).toFixed(2)}`)
+    .map(i => `- ${i.title} x${i.qty} = ${UGX(i.price*i.qty)}`)
     .join("\n")
 
   const text = `Order Request
@@ -16,9 +17,9 @@ Phone: ${order.customer.phone}
 Items:
 ${items}
 
-Subtotal: $${order.subtotal.toFixed(2)}
-Shipping: $${order.shippingFee.toFixed(2)} (${order.shippingZone})
-Total: $${order.total.toFixed(2)}
+Subtotal: ${UGX(order.subtotal)}
+Shipping: ${UGX(order.shippingFee)} (${order.shippingZone})
+Total: ${UGX(order.total)}
 Delivery: ${order.shippingZone === "PICKUP" ? "Pickup" : "Local delivery"}
 Notes: ${order.notes ?? "-"}`
 

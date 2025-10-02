@@ -4,6 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Product } from "@/types/product"
 import { Button } from "@/components/ui/button"
+import { UGX } from "@/lib/currency"
 
 function formatCurrency(n: number) {
   return new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(n)
@@ -22,7 +23,7 @@ export default function ProductCard({ p }: { p: Product }) {
         <p className="text-sm text-gray-500 mt-1">{p.shortDesc}</p>
       </div>
       <div className="flex items-center justify-between">
-        <span className="font-semibold">{formatCurrency(p.price)}</span>
+        <span className="font-semibold">{UGX(p.price)}</span>
         <Link href={`/product/${p.slug}`}>
           <Button>View</Button>
         </Link>

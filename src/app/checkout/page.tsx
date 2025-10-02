@@ -8,6 +8,7 @@ import type { ShippingZoneCode, OrderInput, Customer } from "@/types/cart"
 import { buildWhatsAppLink } from "@/lib/wa"
 import { useRouter } from "next/navigation"
 import { useSettings } from "@/lib/settings"
+import { UGX } from "@/lib/currency"
 
 export default function CheckoutPage() {
   const { items, subtotal, clear } = useCart()
@@ -74,13 +75,13 @@ export default function CheckoutPage() {
           </div>
 
           <div className="flex items-center justify-between pt-2">
-            <span>Subtotal</span><span>${subtotal.toFixed(2)}</span>
+            <span>Subtotal</span><span>{UGX(subtotal)}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span>Shipping</span><span>${shippingFee.toFixed(2)} ({zone})</span>
+            <span>Shipping</span><span>{UGX(shippingFee)} ({zone})</span>
           </div>
           <div className="flex items-center justify-between text-lg font-semibold">
-            <span>Total</span><span>${total.toFixed(2)}</span>
+            <span>Total</span><span>{UGX(total)}</span>
           </div>
 
           <button onClick={placeOrder} className="w-full rounded-lg bg-primary text-white py-2">
