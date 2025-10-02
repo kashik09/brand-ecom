@@ -42,3 +42,13 @@ insert into public.settings_zones(code,label,fee,eta) values
 ('Z3','Outer suburbs',10,'1–2 days'),
 ('PICKUP','Pickup at store',0,'By schedule')
 on conflict (code) do nothing;
+
+-- DOWNLOAD TOKENS (for gated files)
+create table if not exists public.download_tokens (
+  token text primary key,
+  order_id uuid references public.orders(id) on delete cascade,
+  product_id text not null,
+  file_path text not null,
+  expires_at timestamptz not null,
+  remaining int not null
+);
