@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getProductBySlug } from "@/lib/products";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
