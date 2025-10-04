@@ -9,7 +9,7 @@ import { UGX } from "@/lib/currency";
 
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const p = getProductBySlug(params.slug);
+  const p = getProductBySlug(slug);
   if (!p) {
     return { title: "Product", alternates: { canonical: "/shop" } };
   }
@@ -67,8 +67,9 @@ function waLinkForService(title: string) {
   return `https://wa.me/${num}?text=${msg}`;
 }
 
-export default async function Page({ params }: { params: any }) {
-  const p = getProductBySlug(params.slug);
+export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const p = getProductBySlug(slug);
   if (!p) return <div className="py-20">Not found.</div>;
 
   const brand = process.env.NEXT_PUBLIC_BRAND_NAME || "Brand";
@@ -76,7 +77,7 @@ export default async function Page({ params }: { params: any }) {
 
   return (
     <>
-      <ProductJsonLD slug={params.slug} />
+      <ProductJsonLD slug={slug} />
       <article className="grid gap-8 md:grid-cols-2">
         <div className="rounded-2xl border p-6">
           <img
