@@ -1,18 +1,24 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import Image from "next/image"
-import { Product } from "@/types/product"
-import { Button } from "@/components/ui/button"
-import { UGX } from "@/lib/currency"
+import Link from "next/link";
+import Image from "next/image";
+import { Product } from "@/types/product";
+import { Button } from "@/components/ui/button";
+import { UGX } from "@/lib/currency";
 
 function formatCurrency(n: number) {
-  return new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(n)
+  return new Intl.NumberFormat(undefined, {
+    style: "currency",
+    currency: "USD",
+  }).format(n);
 }
 
 export default function ProductCard({ p }: { p: Product }) {
   return (
-    <Link href={`/product/${p.slug}`} className="rounded-2xl border p-4 flex flex-col gap-3 hover:bg-gray-50 dark:hover:bg-gray-900">
+    <Link
+      href={`/product/${p.slug}`}
+      className="rounded-2xl border p-4 flex flex-col gap-3 hover:bg-gray-50 dark:hover:bg-gray-900"
+    >
       <img src={p.image} alt={p.title} className="w-full h-36 object-contain" />
       <div className="flex-1">
         <div className="font-semibold">{p.title}</div>
@@ -23,5 +29,5 @@ export default function ProductCard({ p }: { p: Product }) {
         <span className="text-xs underline">View</span>
       </div>
     </Link>
-  )
+  );
 }

@@ -1,17 +1,17 @@
-import { getProductBySlug } from "@/lib/products"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import AddToCart from "./AddToCart"
-import type { Metadata } from "next"
-import { siteUrl } from "@/lib/site"
-import { UGX } from "@/lib/currency"
+import { getProductBySlug } from "@/lib/products";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import AddToCart from "./AddToCart";
+import type { Metadata } from "next";
+import { siteUrl } from "@/lib/site";
+import { UGX } from "@/lib/currency";
 
-type Params = { params: { slug: string } }
+type Params = { params: { slug: string } };
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  const p = getProductBySlug(params.slug)
+  const p = getProductBySlug(params.slug);
   if (!p) {
-    return { title: "Product", alternates: { canonical: "/shop" } }
+    return { title: "Product", alternates: { canonical: "/shop" } };
   }
   return {
     title: p.title,
@@ -31,12 +31,12 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       description: p.shortDesc,
       images: [siteUrl(p.image)],
     },
-  }
+  };
 }
 
 function ProductJsonLD({ slug }: { slug: string }) {
-  const p = getProductBySlug(slug)
-  if (!p) return null
+  const p = getProductBySlug(slug);
+  if (!p) return null;
   const data = {
     "@context": "https://schema.org/",
     "@type": "Product",
@@ -51,30 +51,39 @@ function ProductJsonLD({ slug }: { slug: string }) {
       availability: "https://schema.org/InStock",
       url: siteUrl(`/product/${p.slug}`),
     },
-  }
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
+  };
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
 }
 
 function waLinkForService(title: string) {
-  const num = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || ""
-  const msg = encodeURIComponent(`Hello! I'm interested in: ${title}`)
-  if (!num) return null
-  return `https://wa.me/${num}?text=${msg}`
+  const num = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "";
+  const msg = encodeURIComponent(`Hello! I'm interested in: ${title}`);
+  if (!num) return null;
+  return `https://wa.me/${num}?text=${msg}`;
 }
 
 export default function ProductPage({ params }: Params) {
-  const p = getProductBySlug(params.slug)
-  if (!p) return <div className="py-20">Not found.</div>
+  const p = getProductBySlug(params.slug);
+  if (!p) return <div className="py-20">Not found.</div>;
 
-  const brand = process.env.NEXT_PUBLIC_BRAND_NAME || "Brand"
-  const wa = p.type === "service" ? waLinkForService(p.title) : null
+  const brand = process.env.NEXT_PUBLIC_BRAND_NAME || "Brand";
+  const wa = p.type === "service" ? waLinkForService(p.title) : null;
 
   return (
     <>
       <ProductJsonLD slug={params.slug} />
       <article className="grid gap-8 md:grid-cols-2">
         <div className="rounded-2xl border p-6">
-          <img src={p.image} alt={p.title} className="w-full h-64 object-contain" />
+          <img
+            src={p.image}
+            alt={p.title}
+            className="w-full h-64 object-contain"
+          />
         </div>
 
         <div className="space-y-4">
@@ -86,11 +95,15 @@ export default function ProductPage({ params }: Params) {
 
           <div className="pt-6 border-t">
             <p className="text-sm text-gray-500">
-              Sold by {brand}. Need help? <Link className="underline" href="/contact">Contact us</Link>.
+              Sold by {brand}. Need help?{" "}
+              <Link className="underline" href="/contact">
+                Contact us
+              </Link>
+              .
             </p>
           </div>
         </div>
       </article>
     </>
-  )
+  );
 }

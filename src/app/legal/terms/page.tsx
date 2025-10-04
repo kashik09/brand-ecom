@@ -4,5 +4,5 @@ export default function TermsPage() {
       <h1>Terms & Conditions</h1>
       <p>Use of this website constitutes acceptance of these terms.</p>
     </article>
-  )
+  );
 }

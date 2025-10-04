@@ -2,7 +2,6 @@
 
   title: "Contact",
   alternates: { canonical: "/contact" },
-}
 
 
 import { useEffect } from "react"

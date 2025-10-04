@@ -1,12 +1,15 @@
-"use client"
-import Link from "next/link"
-import { useCart } from "@/state/cart"
-import { ShoppingCart } from "lucide-react"
+"use client";
+import Link from "next/link";
+import { useCart } from "@/state/cart";
+import { ShoppingCart } from "lucide-react";
 
 export default function CartButton() {
-  const { count } = useCart()
+  const { count } = useCart();
   return (
-    <Link href="/cart" className="relative inline-flex items-center gap-2 text-sm hover:underline">
+    <Link
+      href="/cart"
+      className="relative inline-flex items-center gap-2 text-sm hover:underline"
+    >
       <ShoppingCart size={18} />
       <span>Cart</span>
       {count > 0 && (
@@ -15,5 +18,5 @@ export default function CartButton() {
         </span>
       )}
     </Link>
-  )
+  );
 }
