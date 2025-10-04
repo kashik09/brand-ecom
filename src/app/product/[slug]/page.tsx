@@ -8,7 +8,7 @@ import { siteUrl } from "@/lib/site";
 import { UGX } from "@/lib/currency";
 
 
-export async function generateMetadata({ params }: Params): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const p = getProductBySlug(params.slug);
   if (!p) {
     return { title: "Product", alternates: { canonical: "/shop" } };
