@@ -52,3 +52,16 @@ create table if not exists public.download_tokens (
   expires_at timestamptz not null,
   remaining int not null
 );
+-- === Performance & safety (orders UNNEST) ===
+CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
+CREATE INDEX IF NOT EXISTS idx_download_tokens_order_id ON download_tokens(order_id);
+CREATE UNIQUE INDEX IF NOT EXISTS ux_download_tokens_token ON download_tokens(token);
+
+-- Ensure numeric precision for UGX
+ALTER TABLE orders
+  ALTER COLUMN subtotal TYPE numeric(20,0),
+  ALTER COLUMN shipping_fee TYPE numeric(20,0),
+  ALTER COLUMN total TYPE numeric(20,0);
+
+ALTER TABLE order_items
+  ALTER COLUMN price TYPE numeric(20,0);
