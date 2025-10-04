@@ -8,7 +8,8 @@ import { siteUrl } from "@/lib/site";
 import { UGX } from "@/lib/currency";
 
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
   const p = getProductBySlug(slug);
   if (!p) {
     return { title: "Product", alternates: { canonical: "/shop" } };
@@ -68,8 +69,6 @@ function waLinkForService(title: string) {
 }
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
-  const { slug } = await params
   const p = getProductBySlug(slug);
   if (!p) return <div className="py-20">Not found.</div>;
 
