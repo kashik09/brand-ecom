@@ -1,50 +1,54 @@
-import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
-import { products } from "@/lib/products"
+import { NextResponse } from "next/server";
+import { sql } from "@/lib/db";
+import crypto from "crypto";
 
-function findProductById(id: string) {
-  return products.find(p => p.id === id) || null
-}
+export async function POST(req: Request) {
+  try {
+    const { orderId, ttlMinutes = 60 * 24, maxUses = 3 } = await req.json();
+    if (!orderId) return NextResponse.json({ error: "Missing orderId" }, { status: 400 });
 
-export async function POST(req: NextRequest) {
-  const { searchParams } = new URL(req.url)
-  const orderId = searchParams.get("orderId")
-  if (!orderId) return NextResponse.json({ error: "Missing orderId" }, { status: 400 })
+    // Ensure order exists
+    const ord = await sql/*sql*/`SELECT id FROM orders WHERE id = ${orderId}::uuid`;
+    if (!ord.rowCount) return NextResponse.json({ error: "Order not found" }, { status: 404 });
 
-  // Prisma model is Order, not orders
-  const order = await prisma.order.findUnique({
-    where: { id: orderId },
-    include: { items: true }, // OrderItem[]
-  })
-  if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 })
+    // Fetch only digital items
+    const items = await sql/*sql*/`
+      SELECT product_id, title
+      FROM order_items
+      WHERE order_id = ${orderId}::uuid AND type = 'digital'
+      ORDER BY id ASC
+    `;
 
-  const expiresAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
-  const remaining = 3
-  const origin = new URL(req.url).origin
+    // Map productId -> filePath from seed
+    const { products } = await import("@/lib/products");
+    const ALLOW_PREFIX = "/assets/";
+    const fileById = new Map(products.map((p: any) => [p.id ?? p.slug ?? p.productId, p.filePath]));
 
-  const links: string[] = []
-  for (const item of order.items) {
-    if (item.type !== "digital") continue
-    // Prisma field is productId (camel), mapped to product_id in DB
-    const prod = findProductById(item.productId)
-    if (!prod?.filePath) continue
+    const expiresAt = new Date(Date.now() + ttlMinutes * 60 * 1000);
+    const links: Array<{ productId: string; title: string; token: string; url: string; expiresAt: Date; remaining: number }> = [];
 
-    const token = crypto.randomUUID().replace(/-/g, "")
+    for (const it of items.rows) {
+      const filePath = fileById.get(it.product_id);
+      if (!filePath || !filePath.startsWith(ALLOW_PREFIX)) continue;
 
-    // Prisma model is DownloadToken, fields are camelCase
-    await prisma.downloadToken.create({
-      data: {
+      const token = crypto.randomBytes(24).toString("hex");
+      await sql/*sql*/`
+        INSERT INTO download_tokens (token, order_id, product_id, file_path, expires_at, remaining)
+        VALUES (${token}, ${orderId}::uuid, ${it.product_id}, ${filePath}, ${expiresAt.toISOString()}, ${maxUses})
+      `;
+      links.push({
+        productId: it.product_id,
+        title: it.title,
         token,
-        orderId: order.id,
-        productId: item.productId,
-        filePath: prod.filePath,
+        url: `${process.env.NEXT_PUBLIC_SITE_URL}/api/download?token=${token}`,
         expiresAt,
-        remaining,
-      },
-    })
+        remaining: maxUses,
+      });
+    }
 
-    links.push(`${origin}/api/download?token=${token}`)
+    return NextResponse.json({ links });
+  } catch (e) {
+    console.error("[POST /api/fulfill]", e);
+    return NextResponse.json({ error: "Failed to fulfill" }, { status: 500 });
   }
-
-  return NextResponse.json({ links })
 }
