@@ -1,9 +1,8 @@
-export const metadata = {
+"use client"
   title: "Contact",
   alternates: { canonical: "/contact" },
 }
 
-"use client"
 
 import { useEffect } from "react"
 

@@ -1,6 +1,5 @@
-export const metadata = { title: "Cart", alternates: { canonical: "/cart" } }
-
 "use client"
+
 import { useCart } from "@/state/cart"
 import Link from "next/link"
 
