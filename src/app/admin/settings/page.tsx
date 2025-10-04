@@ -1,4 +1,4 @@
-"use client"
+
 import { useSettings } from "@/lib/settings"
 import type { ShippingZoneCode } from "@/types/cart"
 

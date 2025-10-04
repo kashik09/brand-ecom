@@ -1,4 +1,4 @@
-"use client"
+
 
 import { useCart } from "@/state/cart"
 import Link from "next/link"
