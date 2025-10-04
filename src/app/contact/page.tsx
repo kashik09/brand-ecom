@@ -1,3 +1,4 @@
+"use client"
 
   title: "Contact",
   alternates: { canonical: "/contact" },
