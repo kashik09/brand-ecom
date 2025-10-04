@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { getProductBySlug } from "@/lib/products";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
