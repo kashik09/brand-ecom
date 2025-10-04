@@ -1,4 +1,4 @@
-// @ts-nocheck
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getProductBySlug } from "@/lib/products";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -67,7 +67,7 @@ function waLinkForService(title: string) {
   return `https://wa.me/${num}?text=${msg}`;
 }
 
-export default async function Page({ params }: { params: { slug: string } }) {
+export default async function Page({ params }: { params: any }) {
   const p = getProductBySlug(params.slug);
   if (!p) return <div className="py-20">Not found.</div>;
 
