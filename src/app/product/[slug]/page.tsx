@@ -69,6 +69,7 @@ function waLinkForService(title: string) {
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
+  const { slug } = await params
   const p = getProductBySlug(slug);
   if (!p) return <div className="py-20">Not found.</div>;
 
