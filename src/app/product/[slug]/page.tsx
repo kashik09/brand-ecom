@@ -6,7 +6,6 @@ import type { Metadata } from "next";
 import { siteUrl } from "@/lib/site";
 import { UGX } from "@/lib/currency";
 
-type Params = { params: { slug: string } };
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const p = getProductBySlug(params.slug);
@@ -67,7 +66,7 @@ function waLinkForService(title: string) {
   return `https://wa.me/${num}?text=${msg}`;
 }
 
-export default function ProductPage({ params }: Params) {
+export default async function Page({ params }: { params: { slug: string } }) {
   const p = getProductBySlug(params.slug);
   if (!p) return <div className="py-20">Not found.</div>;
 
