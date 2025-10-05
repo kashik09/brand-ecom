@@ -1,4 +1,3 @@
-import ProductCard from "@/components/ProductCard";
 import { products } from "@/lib/products";
 
 export const metadata = {
