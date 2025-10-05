@@ -1,7 +1,7 @@
 "use client";
 
 import { ThemeProvider } from "@/lib/theme-provider";
-import { SettingsProvider } from "@/state/settings"; // must export SettingsProvider
+import { SettingsProvider } from "@/lib/settings";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
