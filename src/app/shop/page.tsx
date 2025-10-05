@@ -16,12 +16,17 @@ export default function ShopPage() {
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {products.map((p) => (
-          <a href={`/product/`} className="block border rounded p-4 hover:shadow transition">
-  <div className="font-medium">{p.title}</div>
-</a>
+        {products.map((p, i) => (
+          <a
+            key={p.slug ?? p.id ?? i}                // ← key goes here
+            href={`/product/${p.slug ?? ""}`}        // ← include slug if you have it
+            className="block border rounded p-4 hover:shadow transition"
+          >
+            <div className="font-medium">{p.title}</div>
+          </a>
         ))}
       </div>
+
     </section>
   );
 }
