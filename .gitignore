@@ -8,3 +8,7 @@ dist
 
 /generated/prisma
 SNAPSHOT.txt
+
+# Prisma generated client (do not commit)
+generated/
+generated/**

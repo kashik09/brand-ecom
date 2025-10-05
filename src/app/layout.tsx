@@ -1,119 +1,50 @@
-// src/app/layout.tsx
-import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/lib/theme-provider";
-import ThemeToggle from "@/components/theme-toggle";
-import { CartProvider } from "@/state/cart";
-import CartButton from "@/components/CartButton";
-import { SettingsProvider } from "@/lib/settings";
 import Link from "next/link";
-import { siteUrl } from "@/lib/site";
 
-const BRAND = process.env.NEXT_PUBLIC_BRAND_NAME || "BrandName";
-const PRIMARY = process.env.NEXT_PUBLIC_PRIMARY_COLOR || "#0EA5E9";
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-const wa = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER
-  ? `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}`
-  : null;
-
-export const metadata: Metadata = {
-  metadataBase: new URL(BASE),
+export const metadata = {
   title: {
-    default: `${BRAND}`,
-    template: `%s • ${BRAND}`,
+    default: "Shop",
+    template: "%s | Shop",
   },
-  description: "Custom e-commerce MVP",
-  openGraph: {
-    type: "website",
-    url: siteUrl("/"),
-    title: BRAND,
-    description: "Custom e-commerce MVP",
-    siteName: BRAND,
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: BRAND,
-    description: "Custom e-commerce MVP",
-  },
-  alternates: {
-    canonical: siteUrl("/"),
-  },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const brand = BRAND;
-  const primary = PRIMARY;
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const brand = process.env.NEXT_PUBLIC_BRAND_NAME || "Brand";
+  const wa = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100">
-        <style>{`:root{--color-primary:${primary}}`}</style>
+      <body className="min-h-screen flex flex-col">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem={true}>
+          <header className="border-b">
+            <div className="mx-auto w-full max-w-6xl px-6 py-4 flex items-center justify-between">
+              <Link href="/" className="text-lg font-semibold">{brand}</Link>
+              <nav className="flex items-center gap-4 text-sm">
+                <Link href="/shop">Shop</Link>
+                <Link href="/cart">Cart</Link>
+                {wa ? (
+                  <a href={`https://wa.me/${wa}`} target="_blank" rel="noopener noreferrer">
+                    WhatsApp
+                  </a>
+                ) : (
+                  <Link href="/contact">Contact</Link>
+                )}
+                <Link href="/admin">Admin</Link>
+              </nav>
+            </div>
+          </header>
 
-        <ThemeProvider>
-          <SettingsProvider>
-            <CartProvider>
-              <header className="border-b sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur">
-                <div className="container py-3 flex items-center justify-between">
-                  <Link
-                    href="/"
-                    className="font-semibold text-lg"
-                    style={{ color: "var(--color-primary)" }}
-                  >
-                    {brand}
-                  </Link>
-                  <nav className="flex items-center gap-3">
-                    <Link href="/shop" className="text-sm hover:underline">
-                      Shop
-                    </Link>
-                    {wa ? (
-                      <a
-                        href={wa}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-sm hover:underline"
-                      >
-                        WhatsApp
-                      </a>
-                    ) : (
-                      <a href="/contact" className="text-sm hover:underline">
-                        Contact
-                      </a>
-                    )}
-                    <Link href="/admin" className="text-sm hover:underline">
-                      Admin
-                    </Link>
-                    <CartButton />
-                    <ThemeToggle />
-                  </nav>
-                </div>
-              </header>
+          <main className="flex-1">
+            <div className="mx-auto w-full max-w-6xl px-6 py-6">{children}</div>
+          </main>
 
-              <main className="container-narrow py-10">{children}</main>
-
-              <footer className="mt-16 border-t">
-                <div className="container py-8 text-sm text-gray-500 flex items-center justify-between">
-                  <span>
-                    © {new Date().getFullYear()} {brand}
-                  </span>
-                  <div className="flex gap-4">
-                    <Link href="/legal/privacy" className="hover:underline">
-                      Privacy
-                    </Link>
-                    <Link href="/legal/terms" className="hover:underline">
-                      Terms
-                    </Link>
-                    <Link href="/legal/refunds" className="hover:underline">
-                      Refunds
-                    </Link>
-                  </div>
-                </div>
-              </footer>
-            </CartProvider>
-          </SettingsProvider>
+          <footer className="border-t">
+            <div className="mx-auto w-full max-w-6xl px-6 py-8 text-sm opacity-80">
+              © {new Date().getFullYear()} {brand}. All rights reserved.
+            </div>
+          </footer>
         </ThemeProvider>
       </body>
     </html>

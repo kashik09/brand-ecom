@@ -18,15 +18,15 @@ export async function GET(req: Request) {
     RETURNING file_path, remaining
   `;
 
-  if (!upd.rowCount) {
+  if (!upd.length) {
     const check = await sql/*sql*/`SELECT remaining, expires_at FROM download_tokens WHERE token = ${token}`;
-    if (!check.rowCount) return NextResponse.json({ error: "Invalid token" }, { status: 404 });
-    if (check.rows[0].expires_at < new Date()) return NextResponse.json({ error: "Link expired" }, { status: 410 });
-    if (check.rows[0].remaining <= 0) return NextResponse.json({ error: "Download limit reached" }, { status: 429 });
+    if (!check.length) return NextResponse.json({ error: "Invalid token" }, { status: 404 });
+    if (check[0].expires_at < new Date()) return NextResponse.json({ error: "Link expired" }, { status: 410 });
+    if (check[0].remaining <= 0) return NextResponse.json({ error: "Download limit reached" }, { status: 429 });
     return NextResponse.json({ error: "Blocked" }, { status: 403 });
   }
 
-  const { file_path, remaining } = upd.rows[0] as { file_path: string; remaining: number };
+  const { file_path, remaining } = upd[0] as { file_path: string; remaining: number };
 
   if (!file_path || !file_path.startsWith(ALLOW_PREFIX)) {
     // rollback if path invalid

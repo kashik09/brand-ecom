@@ -1,5 +1,5 @@
 import { getProductBySlug } from "@/lib/products";
-import { Button } from "@/components/ui/button";
+
 import Link from "next/link";
 import AddToCart from "./AddToCart";
 import type { Metadata } from "next";
@@ -73,7 +73,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   if (!p) return <div className="py-20">Not found.</div>;
 
   const brand = process.env.NEXT_PUBLIC_BRAND_NAME || "Brand";
-  const wa = p.type === "service" ? waLinkForService(p.title) : null;
+  
 
   return (
     <>

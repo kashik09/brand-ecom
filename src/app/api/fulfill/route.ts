@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import crypto from "crypto";
@@ -9,7 +10,7 @@ export async function POST(req: Request) {
 
     // Ensure order exists
     const ord = await sql/*sql*/`SELECT id FROM orders WHERE id = ${orderId}::uuid`;
-    if (!ord.rowCount) return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    if (!ord.length) return NextResponse.json({ error: "Order not found" }, { status: 404 });
 
     // Fetch only digital items
     const items = await sql/*sql*/`
@@ -27,7 +28,7 @@ export async function POST(req: Request) {
     const expiresAt = new Date(Date.now() + ttlMinutes * 60 * 1000);
     const links: Array<{ productId: string; title: string; token: string; url: string; expiresAt: Date; remaining: number }> = [];
 
-    for (const it of items.rows) {
+    for (const it of items) {
       const filePath = fileById.get(it.product_id);
       if (!filePath || !filePath.startsWith(ALLOW_PREFIX)) continue;
 
