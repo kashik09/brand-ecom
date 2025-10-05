@@ -18,7 +18,9 @@ export default function ShopPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {products.map((p) => (
-          <ProductCard key={p.id} product={p} />
+          <a href={`/product/`} className="block border rounded p-4 hover:shadow transition">
+  <div className="font-medium">{p.title}</div>
+</a>
         ))}
       </div>
     </section>
