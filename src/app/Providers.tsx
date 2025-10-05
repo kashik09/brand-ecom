@@ -1,13 +1,16 @@
 "use client";
 
-import type { ReactNode } from "react";
+import React from "react";
+import { ThemeProvider } from "@/lib/theme-provider";
 import { SettingsProvider } from "@/lib/settings";
 import { CartProvider } from "@/state/cart";
 
-export default function Providers({ children }: { children: ReactNode }) {
+export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <SettingsProvider>
-      <CartProvider>{children}</CartProvider>
-    </SettingsProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <SettingsProvider>
+        <CartProvider>{children}</CartProvider>
+      </SettingsProvider>
+    </ThemeProvider>
   );
 }
