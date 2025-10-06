@@ -21,7 +21,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem={true}>
           <SettingsProvider>
             <CartProvider>
-              {/* Header / Nav */}
               <header className="border-b">
                 <div className="mx-auto w-full max-w-6xl px-6 py-4 flex items-center justify-between">
                   <Link href="/" className="text-lg font-semibold tracking-tight">
@@ -41,24 +40,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
                     <Link href="/admin" className="hover:underline">Admin</Link>
 
-                    <Link href="/cart" className="relative hover:underline flex items-center">
-                      <span className="sr-only">Cart</span>
-                      <CartButton />
-                    </Link>
+                    {/* CartButton already renders its own <Link href="/cart"> — don't wrap it */}
+                    <CartButton />
 
                     <ThemeToggle />
                   </nav>
                 </div>
               </header>
 
-              {/* Page content */}
               <main className="flex-1">
-                <div className="mx-auto w-full max-w-6xl px-6 py-6">
-                  {children}
-                </div>
+                <div className="mx-auto w-full max-w-6xl px-6 py-6">{children}</div>
               </main>
 
-              {/* Sticky footer */}
               <footer className="border-t">
                 <div className="mx-auto w-full max-w-6xl px-6 py-8 text-sm opacity-80 flex flex-wrap items-center justify-between gap-4">
                   <div>© {new Date().getFullYear()} {brand}.</div>
@@ -66,9 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     <Link href="/legal/privacy" className="hover:underline">Privacy</Link>
                     <Link href="/legal/terms" className="hover:underline">Terms</Link>
                     {wa ? (
-                      <a href={`https://wa.me/${wa}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                        WhatsApp
-                      </a>
+                      <a href={`https://wa.me/${wa}`} target="_blank" rel="noopener noreferrer" className="hover:underline">WhatsApp</a>
                     ) : (
                       <Link href="/contact" className="hover:underline">Contact</Link>
                     )}

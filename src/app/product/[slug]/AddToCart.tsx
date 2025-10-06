@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/state/cart";
 import type { Product } from "@/types/product";
@@ -7,21 +9,10 @@ export default function AddToCart({ p }: { p: Product }) {
   return (
     <div className="space-y-2">
       <Button
-        onClick={() =>
-          add({
-            productId: p.id,
-            title: p.title,
-            price: p.price,
-            qty: 1,
-            type: p.type,
-          })
-        }
+        onClick={() => add({ id: p.id, slug: p.slug, title: p.title, price: p.price, type: p.type, qty: 1 })}
       >
         Add to cart
       </Button>
-      <p className="text-xs text-gray-500">
-        Secure digital delivery after checkout.
-      </p>
     </div>
   );
 }
