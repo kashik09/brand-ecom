@@ -23,26 +23,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <CartProvider>
               <header className="border-b">
                 <div className="mx-auto w-full max-w-6xl px-6 py-4 flex items-center justify-between">
-                  <Link href="/" className="text-lg font-semibold tracking-tight">
-                    {brand}
-                  </Link>
-
+                  <Link href="/" className="text-lg font-semibold tracking-tight">{brand}</Link>
                   <nav className="flex items-center gap-4 text-sm">
                     <Link href="/shop" className="hover:underline">Shop</Link>
-
                     {wa ? (
-                      <a href={`https://wa.me/${wa}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                        Contact
-                      </a>
+                      <a href={`https://wa.me/${wa}`} target="_blank" rel="noopener noreferrer" className="hover:underline">Contact</a>
                     ) : (
                       <Link href="/contact" className="hover:underline">Contact</Link>
                     )}
-
-                    <Link href="/admin" className="hover:underline">Admin</Link>
-
-                    {/* CartButton already renders its own <Link href="/cart"> — don't wrap it */}
                     <CartButton />
-
                     <ThemeToggle />
                   </nav>
                 </div>
