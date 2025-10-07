@@ -1,23 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ugx } from "@/lib/currency";
+import { useEffect, useMemo, useState } from "react";
 
-type Zone = { label: string; fee: number; eta: string; updatedAt: string };
+type Zone = { label: string; fee: number; eta: string; updatedAt?: string };
 type ZonesMap = Record<string, Zone>;
 
 async function safeJSON(res: Response) {
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const text = await res.text();
-  if (!text) return {};
-  try { return JSON.parse(text); } catch { return {}; }
+  const t = await res.text();
+  if (!t) return {};
+  try { return JSON.parse(t); } catch { return {}; }
 }
 
 export default function SettingsClient() {
   const [zones, setZones] = useState<ZonesMap>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState({ area: "", fee: 0, eta: "" });
+
+  // modal state
+  const [show, setShow] = useState(false);
+  const [newArea, setNewArea] = useState({ area: "", fee: 0, eta: "" });
 
   const refresh = async () => {
     setLoading(true);
@@ -27,8 +28,7 @@ export default function SettingsClient() {
       const json = await safeJSON(res);
       setZones((json as any).zones || {});
     } catch (e: any) {
-      console.error("Zones load error:", e);
-      setError("Could not load locations. Try again.");
+      setError("Could not load delivery areas.");
       setZones({});
     } finally {
       setLoading(false);
@@ -37,101 +37,185 @@ export default function SettingsClient() {
 
   useEffect(() => { refresh(); }, []);
 
-  const save = async (area: string, patch: Partial<Zone>) => {
+  const entries = useMemo(() => Object.entries(zones), [zones]);
+
+  const update = async (area: string, patch: Partial<Zone> & { newArea?: string }) => {
     await fetch("/api/settings/zones", {
       method: "PATCH",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ code: area, ...patch }),
+      body: JSON.stringify({
+        code: area,
+        newCode: patch.newArea ? String(patch.newArea).trim() : undefined,
+        label: patch.newArea ? String(patch.newArea).trim() : undefined, // mirror label to area
+        fee: typeof patch.fee === "number" ? patch.fee : undefined,
+        eta: typeof patch.eta === "string" ? patch.eta : undefined,
+      }),
     });
-    refresh();
+    await refresh();
   };
 
   const add = async () => {
-    if (!form.area.trim()) return;
+    const area = newArea.area.trim();
+    if (!area) return;
     await fetch("/api/settings/zones", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ code: form.area.trim(), label: form.area.trim(), fee: Number(form.fee||0), eta: form.eta }),
+      body: JSON.stringify({
+        code: area,
+        label: area,
+        fee: Number(newArea.fee || 0),
+        eta: newArea.eta || "",
+      }),
     });
-    setForm({ area: "", fee: 0, eta: "" });
-    refresh();
+    setShow(false);
+    setNewArea({ area: "", fee: 0, eta: "" });
+    await refresh();
   };
 
   const remove = async (area: string) => {
     await fetch(`/api/settings/zones?code=${encodeURIComponent(area)}`, { method: "DELETE" });
-    refresh();
+    await refresh();
   };
 
-  if (loading) return <div className="p-4 animate-pulse text-sm opacity-70">Loading settings…</div>;
-
-  const entries = Object.entries(zones);
+  if (loading) return <div className="p-4 animate-pulse text-sm opacity-70">Loading delivery settings…</div>;
 
   return (
     <div className="space-y-6">
       {error && <div className="rounded-lg border border-red-500/40 bg-red-500/10 text-red-600 px-3 py-2 text-sm">{error}</div>}
 
-      <section className="rounded-2xl border p-4">
-        <h2 className="font-semibold mb-3">Locations (Shipping Areas)</h2>
-        {entries.length === 0 ? (
-          <div className="text-sm opacity-70">No areas yet. Add one below.</div>
-        ) : (
-          <div className="grid sm:grid-cols-2 gap-3">
-            {entries.map(([area, z]) => (
-              <div key={area} className="rounded-xl border p-3 space-y-2">
-                <div className="text-sm opacity-70">Area</div>
-                <div className="font-medium">{area}</div>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold">Delivery Areas</h1>
+        <button
+          onClick={() => setShow(true)}
+          className="rounded-lg border px-3 py-1.5 text-sm hover:bg-accent"
+        >
+          Add delivery area
+        </button>
+      </div>
 
-                <label className="text-sm opacity-70 block mt-2">Fee (UGX)</label>
-                <input
-                  className="w-full rounded border px-2 py-1 bg-background"
-                  type="number"
-                  defaultValue={Number(z.fee)}
-                  onBlur={e => save(area, { fee: Number(e.currentTarget.value || 0) })}
-                />
+      {/* cards, each looks like the add form */}
+      <section className="grid sm:grid-cols-2 gap-4">
+        {entries.map(([area, z]) => {
+          const [name, setName] = useState(area); // local state per render is not allowed; wrap into component
+          return (
+            <AreaCard
+              key={area}
+              area={area}
+              zone={z}
+              onSaveName={(newArea) => update(area, { newArea })}
+              onSaveFee={(fee) => update(area, { fee })}
+              onSaveEta={(eta) => update(area, { eta })}
+              onRemove={() => remove(area)}
+            />
+          );
+        })}
+      </section>
 
-                <label className="text-sm opacity-70 block mt-2">Estimated Time</label>
-                <input
-                  className="w-full rounded border px-2 py-1 bg-background"
-                  type="text"
-                  defaultValue={z.eta}
-                  onBlur={e => save(area, { eta: e.currentTarget.value })}
-                />
-
-                <div className="flex justify-between items-center mt-2 text-xs opacity-70">
-                  <span>Updated: {new Date(z.updatedAt).toLocaleString()}</span>
-                  <button className="underline" onClick={() => remove(area)}>Remove</button>
+      {/* modal for adding new area */}
+      {show && (
+        <div className="fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShow(false)} />
+          <div className="absolute inset-0 flex items-center justify-center p-4">
+            <div className="w-full max-w-md rounded-2xl border bg-background shadow-xl">
+              <div className="p-4 border-b">
+                <h3 className="font-semibold">Add delivery area</h3>
+              </div>
+              <div className="p-4 space-y-3">
+                <div>
+                  <label className="text-sm opacity-70 block">Area name</label>
+                  <input
+                    className="w-full rounded border px-2 py-1 bg-background"
+                    placeholder="e.g., Kampala Central"
+                    value={newArea.area}
+                    onChange={(e) => setNewArea(a => ({ ...a, area: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm opacity-70 block">Delivery fee (UGX)</label>
+                  <input
+                    type="number"
+                    className="w-full rounded border px-2 py-1 bg-background"
+                    placeholder="0"
+                    value={String(newArea.fee)}
+                    onChange={(e) => setNewArea(a => ({ ...a, fee: Number(e.target.value || 0) }))}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm opacity-70 block">Estimated time</label>
+                  <input
+                    className="w-full rounded border px-2 py-1 bg-background"
+                    placeholder="e.g., same day"
+                    value={newArea.eta}
+                    onChange={(e) => setNewArea(a => ({ ...a, eta: e.target.value }))}
+                  />
                 </div>
               </div>
-            ))}
+              <div className="p-4 border-t flex items-center justify-end gap-2">
+                <button className="px-3 py-1.5 text-sm rounded-lg border" onClick={() => setShow(false)}>Cancel</button>
+                <button className="px-3 py-1.5 text-sm rounded-lg border hover:bg-accent" onClick={add}>Add area</button>
+              </div>
+            </div>
           </div>
-        )}
-      </section>
-
-      <section className="rounded-2xl border p-4">
-        <h3 className="font-semibold mb-3">Add new area</h3>
-        <div className="grid sm:grid-cols-3 gap-3">
-          <input
-            className="rounded border px-2 py-1 bg-background"
-            placeholder="Area (e.g., Kampala Central)"
-            value={form.area}
-            onChange={e => setForm(f => ({ ...f, area: e.target.value }))}
-          />
-          <input
-            className="rounded border px-2 py-1 bg-background"
-            type="number"
-            placeholder="Fee (UGX)"
-            value={String(form.fee)}
-            onChange={e => setForm(f => ({ ...f, fee: Number(e.target.value || 0) }))}
-          />
-          <input
-            className="rounded border px-2 py-1 bg-background"
-            placeholder="ETA (e.g., same day)"
-            value={form.eta}
-            onChange={e => setForm(f => ({ ...f, eta: e.target.value }))}
-          />
         </div>
-        <button className="mt-3 rounded-lg border px-3 py-1 text-sm hover:bg-accent" onClick={add}>Add area</button>
-      </section>
+      )}
+    </div>
+  );
+}
+
+/** split card into its own client component so we can have local state per card */
+function AreaCard({
+  area,
+  zone,
+  onSaveName,
+  onSaveFee,
+  onSaveEta,
+  onRemove,
+}: {
+  area: string;
+  zone: Zone;
+  onSaveName: (name: string) => void;
+  onSaveFee: (fee: number) => void;
+  onSaveEta: (eta: string) => void;
+  onRemove: () => void;
+}) {
+  const [name, setName] = useState(area);
+  const [fee, setFee] = useState<number>(Number(zone.fee || 0));
+  const [eta, setEta] = useState(zone.eta || "");
+
+  const niceDate = zone.updatedAt ? new Date(zone.updatedAt).toLocaleString() : "-";
+
+  return (
+    <div className="rounded-2xl border p-4 space-y-2 relative">
+      <div className="text-sm opacity-70">Area</div>
+      <input
+        className="w-full rounded border px-2 py-1 bg-background font-medium"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        onBlur={() => name && name !== area && onSaveName(name)}
+      />
+
+      <label className="text-sm opacity-70 block mt-2">Delivery fee (UGX)</label>
+      <input
+        className="w-full rounded border px-2 py-1 bg-background"
+        type="number"
+        value={String(fee)}
+        onChange={(e) => setFee(Number(e.target.value || 0))}
+        onBlur={() => onSaveFee(fee)}
+      />
+
+      <label className="text-sm opacity-70 block mt-2">Estimated time</label>
+      <input
+        className="w-full rounded border px-2 py-1 bg-background"
+        type="text"
+        value={eta}
+        onChange={(e) => setEta(e.target.value)}
+        onBlur={() => onSaveEta(eta)}
+      />
+
+      <div className="flex items-center justify-between mt-2 text-xs opacity-70">
+        <span>Updated: {niceDate}</span>
+        <button className="underline" onClick={onRemove}>Remove</button>
+      </div>
     </div>
   );
 }
