@@ -93,8 +93,8 @@ export default function SettingsClient() {
         </button>
       </div>
 
-      {/* cards (NO hooks here) */}
-      <section className="grid sm:grid-cols-2 gap-4">
+      {/* VERTICAL list of cards */}
+      <section className="space-y-4">
         {entries.map(([area, z]) => (
           <AreaCard
             key={area}
@@ -121,7 +121,7 @@ export default function SettingsClient() {
                 <div>
                   <label className="text-sm opacity-70 block">Area name</label>
                   <input
-                    className="w-full rounded border px-2 py-1 bg-background"
+                    className="w-full rounded border px-3 py-2 bg-background"
                     placeholder="e.g., Kampala Central"
                     value={newArea.area}
                     onChange={(e) => setNewArea(a => ({ ...a, area: e.target.value }))}
@@ -131,7 +131,7 @@ export default function SettingsClient() {
                   <label className="text-sm opacity-70 block">Delivery fee (UGX)</label>
                   <input
                     type="number"
-                    className="w-full rounded border px-2 py-1 bg-background"
+                    className="w-full rounded border px-3 py-2 bg-background"
                     placeholder="0"
                     value={String(newArea.fee)}
                     onChange={(e) => setNewArea(a => ({ ...a, fee: Number(e.target.value || 0) }))}
@@ -140,7 +140,7 @@ export default function SettingsClient() {
                 <div>
                   <label className="text-sm opacity-70 block">Estimated time</label>
                   <input
-                    className="w-full rounded border px-2 py-1 bg-background"
+                    className="w-full rounded border px-3 py-2 bg-background"
                     placeholder="e.g., same day"
                     value={newArea.eta}
                     onChange={(e) => setNewArea(a => ({ ...a, eta: e.target.value }))}
@@ -178,38 +178,44 @@ function AreaCard({
   const [name, setName] = useState(area);
   const [fee, setFee] = useState<number>(Number(zone.fee || 0));
   const [eta, setEta] = useState(zone.eta || "");
-
   const niceDate = zone.updatedAt ? new Date(zone.updatedAt).toLocaleString() : "-";
 
   return (
-    <div className="rounded-2xl border p-4 space-y-2 relative">
-      <div className="text-sm opacity-70">Area</div>
-      <input
-        className="w-full rounded border px-2 py-1 bg-background font-medium"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        onBlur={() => name && name !== area && onSaveName(name)}
-      />
+    <div className="rounded-2xl border p-4 space-y-3">
+      {/* One ROW inside each card: Area | Fee | ETA */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div>
+          <label className="text-sm opacity-70 block">Area</label>
+          <input
+            className="w-full rounded border px-3 py-2 bg-background font-medium"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onBlur={() => name && name !== area && onSaveName(name)}
+          />
+        </div>
+        <div>
+          <label className="text-sm opacity-70 block">Delivery fee (UGX)</label>
+          <input
+            className="w-full rounded border px-3 py-2 bg-background"
+            type="number"
+            value={String(fee)}
+            onChange={(e) => setFee(Number(e.target.value || 0))}
+            onBlur={() => onSaveFee(fee)}
+          />
+        </div>
+        <div>
+          <label className="text-sm opacity-70 block">Estimated time</label>
+          <input
+            className="w-full rounded border px-3 py-2 bg-background"
+            type="text"
+            value={eta}
+            onChange={(e) => setEta(e.target.value)}
+            onBlur={() => onSaveEta(eta)}
+          />
+        </div>
+      </div>
 
-      <label className="text-sm opacity-70 block mt-2">Delivery fee (UGX)</label>
-      <input
-        className="w-full rounded border px-2 py-1 bg-background"
-        type="number"
-        value={String(fee)}
-        onChange={(e) => setFee(Number(e.target.value || 0))}
-        onBlur={() => onSaveFee(fee)}
-      />
-
-      <label className="text-sm opacity-70 block mt-2">Estimated time</label>
-      <input
-        className="w-full rounded border px-2 py-1 bg-background"
-        type="text"
-        value={eta}
-        onChange={(e) => setEta(e.target.value)}
-        onBlur={() => onSaveEta(eta)}
-      />
-
-      <div className="flex items-center justify-between mt-2 text-xs opacity-70">
+      <div className="flex items-center justify-between text-xs opacity-70">
         <span>Updated: {niceDate}</span>
         <button className="underline" onClick={onRemove}>Remove</button>
       </div>
