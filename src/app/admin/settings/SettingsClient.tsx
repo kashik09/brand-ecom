@@ -27,7 +27,7 @@ export default function SettingsClient() {
       const res = await fetch("/api/settings/zones", { cache: "no-store" });
       const json = await safeJSON(res);
       setZones((json as any).zones || {});
-    } catch (e: any) {
+    } catch {
       setError("Could not load delivery areas.");
       setZones({});
     } finally {
@@ -46,7 +46,7 @@ export default function SettingsClient() {
       body: JSON.stringify({
         code: area,
         newCode: patch.newArea ? String(patch.newArea).trim() : undefined,
-        label: patch.newArea ? String(patch.newArea).trim() : undefined, // mirror label to area
+        label: patch.newArea ? String(patch.newArea).trim() : undefined,
         fee: typeof patch.fee === "number" ? patch.fee : undefined,
         eta: typeof patch.eta === "string" ? patch.eta : undefined,
       }),
@@ -93,22 +93,19 @@ export default function SettingsClient() {
         </button>
       </div>
 
-      {/* cards, each looks like the add form */}
+      {/* cards (NO hooks here) */}
       <section className="grid sm:grid-cols-2 gap-4">
-        {entries.map(([area, z]) => {
-          const [name, setName] = useState(area); // local state per render is not allowed; wrap into component
-          return (
-            <AreaCard
-              key={area}
-              area={area}
-              zone={z}
-              onSaveName={(newArea) => update(area, { newArea })}
-              onSaveFee={(fee) => update(area, { fee })}
-              onSaveEta={(eta) => update(area, { eta })}
-              onRemove={() => remove(area)}
-            />
-          );
-        })}
+        {entries.map(([area, z]) => (
+          <AreaCard
+            key={area}
+            area={area}
+            zone={z}
+            onSaveName={(newArea) => update(area, { newArea })}
+            onSaveFee={(fee) => update(area, { fee })}
+            onSaveEta={(eta) => update(area, { eta })}
+            onRemove={() => remove(area)}
+          />
+        ))}
       </section>
 
       {/* modal for adding new area */}
@@ -162,7 +159,7 @@ export default function SettingsClient() {
   );
 }
 
-/** split card into its own client component so we can have local state per card */
+/** Per-card component with its own hooks */
 function AreaCard({
   area,
   zone,
