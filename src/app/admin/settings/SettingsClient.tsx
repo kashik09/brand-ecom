@@ -47,6 +47,7 @@ export default function SettingsClient() {
 
   const entries = useMemo(() => Object.entries(zones), [zones]);
 
+  // ROBUST PATCH: allow 0, ignore NaN/undefined for fee
   const update = async (area: string, patch: Partial<Zone> & { newArea?: string }) => {
     await fetch("/api/settings/zones", {
       method: "PATCH",
@@ -55,7 +56,7 @@ export default function SettingsClient() {
         code: area,
         newCode: patch.newArea ? String(patch.newArea).trim() : undefined,
         label: patch.newArea ? String(patch.newArea).trim() : undefined,
-        fee: typeof patch.fee === "number" ? patch.fee : undefined,
+        fee: Number.isFinite(patch.fee as number) ? Number(patch.fee) : undefined,
         eta: typeof patch.eta === "string" ? patch.eta : undefined,
       }),
     });
@@ -181,7 +182,7 @@ function AreaCard({
   onRemove: () => void;
 }) {
   const [name, setName] = useState(area);
-  const [fee, setFee] = useState<number>(Number(zone.fee || 0));
+  const [fee, setFee] = useState<number>(Number(zone.fee ?? 0));
   const [eta, setEta] = useState(zone.eta || "");
   const niceDate = zone.updatedAt ? new Date(zone.updatedAt).toLocaleString() : "-";
 
