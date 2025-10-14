@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { getProductBySlug } from "@/lib/products";
 
 import Link from "next/link";
@@ -60,7 +61,6 @@ function ProductJsonLD({ slug }: { slug: string }) {
   );
 }
 
-function waLinkForService(title: string) {
   const num = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "";
   const msg = encodeURIComponent(`Hello! I'm interested in: ${title}`);
   if (!num) return null;
