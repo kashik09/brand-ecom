@@ -61,6 +61,8 @@ function ProductJsonLD({ slug }: { slug: string }) {
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function waLinkForService(title: string): string | null {
   const num = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "";
   const msg = encodeURIComponent(`Hello! I'm interested in: ${title}`);
   if (!num) return null;
