@@ -27,7 +27,7 @@ export default function SettingsClient() {
     try {
       const res = await fetch("/api/settings/zones", { cache: "no-store" });
       const json = await safeJSON(res);
-      setZones((json as any).zones || {});
+      setZones((json as unknown).zones || {});
     } catch {
       setError("Could not load delivery areas.");
       setZones({});

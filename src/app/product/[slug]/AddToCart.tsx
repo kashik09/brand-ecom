@@ -9,7 +9,7 @@ export default function AddToCart({ p }: { p: Product }) {
   return (
     <div className="space-y-2">
       <Button
-        onClick={() => add({ id: p.id, slug: p.slug, title: p.title, price: p.price, type: p.type, qty: 1 })}
+        onClick={() => add({ slug: p.slug, title: p.title, price: p.price, type: p.type, qty: 1 })}
       >
         Add to cart
       </Button>
