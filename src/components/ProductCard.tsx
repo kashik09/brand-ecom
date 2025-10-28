@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ugx } from "@/lib/currency";
+import { UGX } from "@/lib/currency";
 
 type Props = { slug: string; title: string; price: number; image?: string; blurb?: string };
 
@@ -15,7 +15,7 @@ export default function ProductCard({ slug, title, price, image, blurb }: Props)
           <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-[1.02] transition" />
         ) : null}
         <span className="absolute top-3 right-3 text-xs bg-background/80 backdrop-blur px-2 py-1 rounded border">
-          {ugx(price)}
+          {UGX(price)}
         </span>
       </div>
       <div className="p-4">

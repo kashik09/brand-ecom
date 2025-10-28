@@ -5,6 +5,7 @@ import * as ReactDOM from "react-dom";
 
 type Zone = { label: string; fee: number; eta: string; updatedAt?: string };
 type ZonesMap = Record<string, Zone>;
+type SettingsResponse = { zones?: ZonesMap };
 
 async function safeJSON(res: Response) {
   const t = await res.text();
@@ -27,7 +28,7 @@ export default function SettingsClient() {
     try {
       const res = await fetch("/api/settings/zones", { cache: "no-store" });
       const json = await safeJSON(res);
-      setZones((json as unknown).zones || {});
+      setZones((json as SettingsResponse)?.zones || {});
     } catch {
       setError("Could not load delivery areas.");
       setZones({});
