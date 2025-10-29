@@ -28,27 +28,16 @@ model Profile {
 model Order {
   id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt     DateTime @default(now()) @map("created_at")
-
-  // choose ONE of these two styles ↓↓↓ (uncomment what you want)
-  // If you want NO cents (UGX):
   subtotal      Decimal  @db.Decimal(20, 0)
   shippingZone  String   @map("shipping_zone")
   shippingFee   Decimal  @db.Decimal(20, 0) @map("shipping_fee")
   total         Decimal  @db.Decimal(20, 0)
-
-  // If you want optional cents (comment the block above, uncomment below):
-  // subtotal      Decimal  @db.Decimal(20, 2)
-  // shippingZone  String   @map("shipping_zone")
-  // shippingFee   Decimal  @db.Decimal(20, 2) @map("shipping_fee")
-  // total         Decimal  @db.Decimal(20, 2)
-
   customerName  String?  @map("customer_name")
   customerEmail String?  @map("customer_email")
   customerPhone String?  @map("customer_phone")
   notes         String?
-
   items         OrderItem[]
-
+  
   @@map("orders")
 }
 
@@ -57,14 +46,11 @@ model OrderItem {
   orderId   String  @db.Uuid @map("order_id")
   productId String  @map("product_id")
   title     String
-
-  // match the choice above (0 or 2)
   price     Decimal @db.Decimal(20, 0)
-
   qty       Int
   type      String
-  order     Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
   @@map("order_items")
 }
 
@@ -75,24 +61,8 @@ model DownloadToken {
   filePath  String   @map("file_path")
   expiresAt DateTime @map("expires_at")
   remaining Int
-
+  
   @@map("download_tokens")
-}
-
-model Product {
-  id          String   @id @default(uuid())
-  slug        String   @unique
-  title       String
-  description String?  @db.Text
-  price       Decimal  @db.Decimal(20, 0)
-  image       String?
-  type        String   // "digital" or "physical"
-  filePath    String?  @map("file_path")
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  @@map("products")
 }
 
 model Product {
@@ -108,6 +78,6 @@ model Product {
   active      Boolean  @default(true)
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
-
+  
   @@map("products")
 }
