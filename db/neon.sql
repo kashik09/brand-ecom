@@ -65,3 +65,21 @@ ALTER TABLE orders
 
 ALTER TABLE order_items
   ALTER COLUMN price TYPE numeric(20,0);
+
+-- PRODUCTS TABLE
+CREATE TABLE IF NOT EXISTS public.products (
+  id text primary key default gen_random_uuid()::text,
+  slug text unique not null,
+  title text not null,
+  description text,
+  price numeric(20,0) not null,
+  image text,
+  type text not null,
+  file_path text,
+  active boolean default true,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_products_slug ON products(slug);
+CREATE INDEX IF NOT EXISTS idx_products_active ON products(active);
