@@ -1,9 +1,13 @@
 "use client"
 import { useCart } from "@/state/cart";
 import Link from "next/link";
+import { UGX } from "@/lib/currency";
 
 export default function CartPage() {
-  const { items, remove, setQty, subtotal } = useCart();
+  const { items, remove, update } = useCart();
+
+  // Calculate subtotal
+  const subtotal = items.reduce((sum, item) => sum + item.price * item.qty, 0);
 
   if (items.length === 0) {
     return (
@@ -28,8 +32,8 @@ export default function CartPage() {
           >
             <div>
               <div className="font-medium">{i.title}</div>
-              <div className="text-sm text-gray-500">
-                ${i.price.toFixed(2)} • {i.type}
+              <div className="text-sm opacity-70">
+                {UGX(i.price)} • {i.type}
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -38,7 +42,7 @@ export default function CartPage() {
                 min={1}
                 value={i.qty}
                 onChange={(e) =>
-                  setQty(i.id, Math.max(1, Number(e.target.value)))
+                  update(i.id, Math.max(1, Number(e.target.value)))
                 }
                 className="w-16 rounded border bg-transparent px-2 py-1"
               />
@@ -55,7 +59,7 @@ export default function CartPage() {
 
       <div className="flex items-center justify-between">
         <span className="text-lg font-semibold">Subtotal</span>
-        <span className="text-lg font-semibold">${subtotal.toFixed(2)}</span>
+        <span className="text-lg font-semibold">{UGX(subtotal)}</span>
       </div>
 
       <Link href="/checkout" className="inline-block underline">
