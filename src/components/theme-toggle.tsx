@@ -1,17 +1,19 @@
 "use client";
-
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sun, Moon } from "lucide-react";
 
 export default function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+
   useEffect(() => setMounted(true), []);
+
   if (!mounted) return null;
 
-  const isDark = theme === "dark";
+  // Use resolvedTheme to get the actual theme (accounts for "system")
+  const isDark = resolvedTheme === "dark";
 
   return (
     <Button
