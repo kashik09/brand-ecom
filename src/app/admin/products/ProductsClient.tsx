@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { UGX } from "@/lib/currency";
+import Image from "next/image";
 
 type Product = {
   id: string;
@@ -140,11 +141,14 @@ export default function ProductsClient() {
         {products.map((product) => (
           <div key={product.id} className="rounded-lg border p-4 space-y-3">
             {product.image && (
-              <img
-                src={product.image}
-                alt={product.title}
-                className="w-full h-32 object-cover rounded"
-              />
+              <div className="relative w-full h-32">
+                <Image
+                  src={product.image}
+                  alt={product.title}
+                  fill
+                  className="object-cover rounded"
+                />
+              </div>
             )}
             <div>
               <h3 className="font-semibold">{product.title}</h3>
@@ -254,7 +258,7 @@ export default function ProductsClient() {
                   <select
                     className="w-full rounded border px-3 py-2 bg-transparent"
                     value={formData.type}
-                    onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
+                    onChange={(e) => setFormData({ ...formData, type: e.target.value as "digital" | "service" | "physical" })}
                   >
                     <option value="digital">Digital</option>
                     <option value="service">Service</option>
