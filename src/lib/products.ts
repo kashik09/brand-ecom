@@ -63,6 +63,19 @@ export const fallbackProducts: Product[] = [
   }
 ];
 
+type DbProduct = {
+  id: string;
+  slug: string;
+  title: string;
+  description: string | null;
+  price: number;
+  image: string | null;
+  type: string;
+  file_path: string | null;
+  short_desc: string | null;
+  active: boolean;
+};
+
 // Fetch products from database
 export async function getProducts(): Promise<Product[]> {
   try {
@@ -73,16 +86,16 @@ export async function getProducts(): Promise<Product[]> {
       ORDER BY created_at DESC
     `;
     
-    return rows.map((r: any) => ({
+    return (rows as DbProduct[]).map((r) => ({
       id: r.id,
       slug: r.slug,
       title: r.title,
       type: r.type as "digital" | "service" | "physical",
       price: Number(r.price),
       shortDesc: r.short_desc || r.description?.substring(0, 100),
-      image: r.image,
-      filePath: r.file_path,
-      description: r.description,
+      image: r.image || undefined,
+      filePath: r.file_path || undefined,
+      description: r.description || undefined,
     }));
   } catch (error) {
     console.warn("Failed to fetch products from database, using fallback:", error);
@@ -104,7 +117,7 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
       return fallbackProducts.find(p => p.slug === slug) || null;
     }
     
-    const r = rows[0];
+    const r = rows[0] as DbProduct;
     return {
       id: r.id,
       slug: r.slug,
@@ -112,9 +125,9 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
       type: r.type as "digital" | "service" | "physical",
       price: Number(r.price),
       shortDesc: r.short_desc || r.description?.substring(0, 100),
-      image: r.image,
-      filePath: r.file_path,
-      description: r.description,
+      image: r.image || undefined,
+      filePath: r.file_path || undefined,
+      description: r.description || undefined,
     };
   } catch (error) {
     console.warn("Failed to fetch product, using fallback:", error);
