@@ -21,8 +21,6 @@ model User {
 model Profile {
   userId   String  @id
   user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  // extra fields you want later
-  // location  String?
 }
 
 model Order {
@@ -80,4 +78,14 @@ model Product {
   updatedAt   DateTime @updatedAt @map("updated_at")
   
   @@map("products")
+}
+
+model SettingsZone {
+  code      String   @id
+  label     String
+  fee       Decimal  @db.Decimal(20, 0)
+  eta       String
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  
+  @@map("settings_zones")
 }
