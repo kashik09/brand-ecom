@@ -1,62 +1,55 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 import type { CartItem } from "@/types/cart";
 
-type CartCtx = {
+const CartContext = createContext<{
   items: CartItem[];
   add: (item: Omit<CartItem, "id">) => void;
   remove: (id: string) => void;
-  setQty: (id: string, qty: number) => void;
+  update: (id: string, qty: number) => void;
   clear: () => void;
-  count: number;
-  subtotal: number;
-};
-const Ctx = createContext<CartCtx | null>(null);
+} | null>(null);
 
-const KEY = "cart.v1";
+// Simple UUID generator that works everywhere
+function generateId() {
+  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+}
 
-export function CartProvider({ children }: { children: React.ReactNode }) {
+export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(KEY);
-      if (raw) setItems(JSON.parse(raw));
-    } catch {}
-  }, []);
-  useEffect(() => {
-    localStorage.setItem(KEY, JSON.stringify(items));
-  }, [items]);
-
-  const add: CartCtx["add"] = (it) => {
+  const add = (it: Omit<CartItem, "id">) => {
     setItems((prev) => {
-      const found = prev.find((p) => p.productId === it.productId);
-      if (found)
+      const existing = prev.find((p) => p.productId === it.productId);
+      if (existing) {
         return prev.map((p) =>
           p.productId === it.productId ? { ...p, qty: p.qty + it.qty } : p,
         );
-      return [...prev, { ...it, id: crypto.randomUUID() }];
+      }
+      return [...prev, { ...it, id: generateId() }];
     });
   };
+
   const remove = (id: string) =>
-    setItems((prev) => prev.filter((p) => p.id !== id));
-  const setQty = (id: string, qty: number) =>
-    setItems((prev) => prev.map((p) => (p.id === id ? { ...p, qty } : p)));
+    setItems((prev) => prev.filter((it) => it.id !== id));
+
+  const update = (id: string, qty: number) =>
+    setItems((prev) =>
+      prev.map((it) => (it.id === id ? { ...it, qty } : it)),
+    );
+
   const clear = () => setItems([]);
 
-  const subtotal = useMemo(
-    () => items.reduce((s, i) => s + i.price * i.qty, 0),
-    [items],
+  return (
+    <CartContext.Provider value={{ items, add, remove, update, clear }}>
+      {children}
+    </CartContext.Provider>
   );
-  const count = useMemo(() => items.reduce((s, i) => s + i.qty, 0), [items]);
-
-  const value: CartCtx = { items, add, remove, setQty, clear, count, subtotal };
-  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
 export function useCart() {
-  const ctx = useContext(Ctx);
+  const ctx = useContext(CartContext);
   if (!ctx) throw new Error("useCart must be used within CartProvider");
   return ctx;
 }
