@@ -1,6 +1,8 @@
-import { Product } from "@/types/product"
+import { Product } from "@/types/product";
+import { sql } from "@/lib/db";
 
-export const products: Product[] = [
+// Fallback products (used if database is empty or unavailable)
+export const fallbackProducts: Product[] = [
   {
     id: "p1",
     slug: "minimal-portfolio-template",
@@ -59,8 +61,66 @@ export const products: Product[] = [
     image: "/next.svg",
     filePath: "/assets/icons-pack.zip"
   }
-]
+];
 
-export function getProductBySlug(slug: string) {
-  return products.find(p => p.slug === slug) || null
+// Fetch products from database
+export async function getProducts(): Promise<Product[]> {
+  try {
+    const rows = await sql/*sql*/`
+      SELECT id, slug, title, description, price, image, type, file_path, short_desc, active
+      FROM products
+      WHERE active = true
+      ORDER BY created_at DESC
+    `;
+    
+    return rows.map((r: any) => ({
+      id: r.id,
+      slug: r.slug,
+      title: r.title,
+      type: r.type as "digital" | "service" | "physical",
+      price: Number(r.price),
+      shortDesc: r.short_desc || r.description?.substring(0, 100),
+      image: r.image,
+      filePath: r.file_path,
+      description: r.description,
+    }));
+  } catch (error) {
+    console.warn("Failed to fetch products from database, using fallback:", error);
+    return fallbackProducts;
+  }
 }
+
+export async function getProductBySlug(slug: string): Promise<Product | null> {
+  try {
+    const rows = await sql/*sql*/`
+      SELECT id, slug, title, description, price, image, type, file_path, short_desc
+      FROM products
+      WHERE slug = ${slug} AND active = true
+      LIMIT 1
+    `;
+    
+    if (rows.length === 0) {
+      // Fallback to hardcoded products
+      return fallbackProducts.find(p => p.slug === slug) || null;
+    }
+    
+    const r = rows[0];
+    return {
+      id: r.id,
+      slug: r.slug,
+      title: r.title,
+      type: r.type as "digital" | "service" | "physical",
+      price: Number(r.price),
+      shortDesc: r.short_desc || r.description?.substring(0, 100),
+      image: r.image,
+      filePath: r.file_path,
+      description: r.description,
+    };
+  } catch (error) {
+    console.warn("Failed to fetch product, using fallback:", error);
+    return fallbackProducts.find(p => p.slug === slug) || null;
+  }
+}
+
+// For backward compatibility (sync version using fallback)
+export const products = fallbackProducts;
