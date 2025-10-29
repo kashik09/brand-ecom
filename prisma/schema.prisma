@@ -78,3 +78,36 @@ model DownloadToken {
 
   @@map("download_tokens")
 }
+
+model Product {
+  id          String   @id @default(uuid())
+  slug        String   @unique
+  title       String
+  description String?  @db.Text
+  price       Decimal  @db.Decimal(20, 0)
+  image       String?
+  type        String   // "digital" or "physical"
+  filePath    String?  @map("file_path")
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("products")
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  slug        String   @unique
+  title       String
+  description String?  @db.Text
+  price       Decimal  @db.Decimal(20, 0)
+  image       String?
+  type        String   // "digital", "service", or "physical"
+  filePath    String?  @map("file_path")
+  shortDesc   String?  @map("short_desc")
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("products")
+}
